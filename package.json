@@ -1,17 +1,22 @@
 {
-  "name": "goodtunes-api",
+  "name": "good-tunes-api",
   "version": "0.0.1",
   "description": "Good Tunes API",
   "main": "index.js",
   "scripts": {
     "test": "mocha"
   },
-  "author": "Ian Huntington",
+  "author": "Cheese Shed",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CheeseShed/Good-Tunes-API"
+  },
   "dependencies": {
     "body-parser": "^1.4.3",
     "express": "^4.4.5",
     "mongoose": "^3.8.12",
-    "passport": "^0.2.0"
+    "passport": "^0.2.0",
+    "passport-local": "^1.0.0"
   }
 }

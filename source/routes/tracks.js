@@ -1,4 +1,6 @@
 module.exports = function(router) {
+    'use strict'
+    
     var Track = require('../models/track')
 
     router.route('/tracks')
