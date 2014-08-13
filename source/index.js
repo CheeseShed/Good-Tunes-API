@@ -1,23 +1,18 @@
-'use strict'
+'use strict';
 
-var express = require('express')
-var bodyParser = require('body-parser')
-var mongoose = require('mongoose')
-var app = express()
-var router = express.Router()
-var port = process.env.PORT || 8080
+var Hapi = require('hapi');
+var access = require('./util/access');
+var server = new Hapi.Server(process.env.HOST, process.env.PORT);
+var mongoose = require('mongoose');
+var mongoConnectionURI = 'mongodb://' + process.env.MONGO_HOST + ':' + process.env.MONGO_PORT + '/' + process.env.MONGO_DBNAME;
 
-mongoose.connect('mongodb://localhost:27017/goodtunes')
+mongoose.connect(mongoConnectionURI);
 
-app.use(bodyParser.urlencoded({
-    extended: true
-}))
-app.use(bodyParser.json())
+access(server);
+require('./routes/users')(server);
+// require('./routes/playlists')(router)
+// require('./routes/tracks')(router)
 
-require('./routes/users')(router)
-require('./routes/playlists')(router)
-require('./routes/tracks')(router)
-
-app.use('/api/v1', router)
-
-app.listen(port)
+server.start(function () {
+	console.log('Server started at', server.info.uri);
+});

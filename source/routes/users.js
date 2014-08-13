@@ -1,47 +1,58 @@
-module.exports = function(router) {
-    var User = require('../models/user')
+module.exports = function (server) {
 
-    router.route('/users')
+    'use strict';
 
-        .post(function(req, res) {
-            User.create(req.body, function(err, user) {
-                if (err) {
-                    return res.send(err)
-                }
-                res.json(user)
-            })
-        })
+    var User = require('../models/user');
 
-        .get(function(req, res) {
+    server.route({
+        method: 'GET',
+        path: '/v1/users',
+        config: {
+            auth: 'simple'
+        },
+        handler: function (request, reply) {
             User.find(function(err, users) {
                 if (err) {
-                    return res.send(err)
+                    return reply(err);
                 }
-                res.json(users)
-            })
-        })
+                reply(users);
+            });
+        }
+    });
 
-
-    router.route('/users/:userId')
-
-        .get(function(req, res) {
-            User.findById(req.params.userId, function(err, user) {
+    server.route({
+        method: 'POST',
+        path: '/v1/users',
+        handler: function (request, reply) {
+            User.create(request.body, function(err, user) {
                 if (err) {
-                    return res.json(err)
+                    return reply(err);
                 }
-                res.json(user)
-            })
-        })
+                reply(user);
+            });
+        }
+    });
 
-        .put(function(req, res) {
-            User.findOneAndUpdate({
-                _id: req.params.userId
-            }, req.body, function(err, user) {
-                if (err) {
-                    return res.json(err)
-                }
-                res.json(user)
-            })
-        })
 
+//    server.route('/users/:userId')
+//
+//        .get(function(req, res) {
+//            User.findById(req.params.userId, function(err, user) {
+//                if (err) {
+//                    return res.json(err);
+//                }
+//                res.json(user);
+//            });
+//        })
+//
+//        .put(function(req, res) {
+//            User.findOneAndUpdate({
+//                _id: req.params.userId
+//            }, req.body, function(err, user) {
+//                if (err) {
+//                    return res.json(err);
+//                }
+//                res.json(user);
+//            });
+//        });
 };

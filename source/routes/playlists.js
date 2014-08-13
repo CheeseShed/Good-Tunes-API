@@ -47,7 +47,7 @@ module.exports = function(router) {
 
             if (req.body.tracks && req.body.tracks.length) {
                 var test = req.body.tracks.map(function(trackId) {
-                    
+
                     return new ObjectId(trackId)
                 })
                 console.log(test)
