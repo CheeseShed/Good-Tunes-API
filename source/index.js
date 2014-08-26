@@ -10,8 +10,6 @@ mongoose.connect(mongoConnectionURI);
 
 access(server);
 require('./routes/users')(server);
-// require('./routes/playlists')(router)
-// require('./routes/tracks')(router)
 
 server.start(function () {
 	console.log('Server started at', server.info.uri);

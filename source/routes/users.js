@@ -2,57 +2,57 @@ module.exports = function (server) {
 
     'use strict';
 
-    var User = require('../models/user');
+    var Joi = require('joi');
+    var userCtrl = require('../controllers/user');
+    var prefix = '/v1';
 
     server.route({
         method: 'GET',
-        path: '/v1/users',
-        config: {
-            auth: 'simple'
-        },
-        handler: function (request, reply) {
-            User.find(function(err, users) {
-                if (err) {
-                    return reply(err);
-                }
-                reply(users);
-            });
-        }
+        path: prefix + '/users',
+        handler: userCtrl.read.all
+    });
+
+    server.route({
+        method: 'GET',
+        path: prefix + '/users/{userId}',
+        handler: userCtrl.read.one
     });
 
     server.route({
         method: 'POST',
-        path: '/v1/users',
-        handler: function (request, reply) {
-            User.create(request.body, function(err, user) {
-                if (err) {
-                    return reply(err);
+        path: prefix + '/users',
+        config: {
+            // auth: 'simple',
+            validate: {
+                payload: {
+                    name: Joi.string().min(2).max(64).required(),
+                    email: Joi.string().email().required(),
+                    password: Joi.string().min(8).max(32).required()
                 }
-                reply(user);
-            });
-        }
+            }
+        },
+        handler: userCtrl.create
     });
 
+    server.route({
+        method: 'PUT',
+        path: prefix + '/users/{userId}',
+        config: {
+            validate: {
+                payload: {
+                    name: Joi.string().min(2).max(64),
+                    email: Joi.string().email(),
+                    password: Joi.string().min(8).max(32)
+                }
+            }
+        },
+        handler: userCtrl.update
+    });
 
-//    server.route('/users/:userId')
-//
-//        .get(function(req, res) {
-//            User.findById(req.params.userId, function(err, user) {
-//                if (err) {
-//                    return res.json(err);
-//                }
-//                res.json(user);
-//            });
-//        })
-//
-//        .put(function(req, res) {
-//            User.findOneAndUpdate({
-//                _id: req.params.userId
-//            }, req.body, function(err, user) {
-//                if (err) {
-//                    return res.json(err);
-//                }
-//                res.json(user);
-//            });
-//        });
+    server.route({
+        method: 'DELETE',
+        path: prefix + '/users/{userId}',
+        handler: userCtrl.destroy
+    });
+
 };

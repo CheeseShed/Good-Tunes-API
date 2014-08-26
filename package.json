@@ -4,6 +4,7 @@
   "description": "Good Tunes API",
   "main": "index.js",
   "scripts": {
+    "start": "env $(cat ./config/.local.env) nodemon ./source/index.js",
     "test": "mocha"
   },
   "author": "Cheese Shed",
@@ -13,13 +14,10 @@
     "url": "https://github.com/CheeseShed/Good-Tunes-API"
   },
   "dependencies": {
-    "body-parser": "^1.4.3",
-    "express": "^4.4.5",
     "hapi": "^6.5.0",
     "hapi-auth-bearer-token": "^1.1.3",
-    "mongoose": "^3.8.12",
-    "passport": "^0.2.0",
-    "passport-local": "^1.0.0"
+    "joi": "^4.6.2",
+    "mongoose": "^3.8.12"
   },
   "devDependencies": {
     "chai": "^1.9.1",
