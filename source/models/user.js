@@ -85,11 +85,11 @@ UserSchema.set('toJSON', {
 });
 
 UserSchema.options.toJSON.transform = function (doc, model) {
-    delete ret._id;
-    delete ret.__v;
-    delete ret.salt;
-    delete ret.hash;
-    return ret;
+    delete model._id;
+    delete model.__v;
+    delete model.salt;
+    delete model.hash;
+    return model;
 };
 
 module.exports = mongoose.model('User', UserSchema);

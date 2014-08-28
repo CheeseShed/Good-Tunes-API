@@ -37,17 +37,22 @@ exports.read = {
 		})
 	},
 	one: function (request, reply) {
-		var query = {
-            id: request.params.userId
-        };
-        console.log(query);
-        console.log('before Model');
-		User.findOne(query).exec(function (err, user) {
+		var options = {};
+
+        options._id = request.params.userId;
+
+		User.findOne(options).exec(function (err, user) {
 			if (err) {
                 console.log(err);
 				return reply(err);
 			}
-            console.log(user);
+
+            if (!user) {
+                return reply({
+                    message: 'User was not found'
+                });
+            }
+
 			reply(user);
 		});
 	}
