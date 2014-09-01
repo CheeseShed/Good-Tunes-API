@@ -1,13 +1,31 @@
 # Good Tunes API
 
-This is the result of a couple of hours tinkering with some models and routes
+## Setting up server locally
 
-TODO:
+Vagrant support is coming soon, however in the interim:
 
-* add hinting
-* add mocha, sinon, chai
-* user authentication
-* validation of data
-* rest of the shit
+### Homebrew
 
-See this as a VERY early starting point :) 
+Make sure you have Homebrew installed, you can do that by checking for the version:
+
+```
+brew -v
+```
+
+You will need to brew the following items:
+
+```
+brew install nginx
+```
+
+### NginX
+
+If you have Apache running you will need to stop the process:
+
+```
+sudo apachectl stop
+```
+
+Now you need to setup the Good Tunes server configuration:
+
+
