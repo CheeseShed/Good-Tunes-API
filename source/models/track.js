@@ -1,14 +1,10 @@
-'use strict'
+'use strict';
 
-var mongoose = require('mongoose')
-var Schema = mongoose.Schema
-var TrackSchema
+var mongoose = require('mongoose'),
+    Schema = mongoose.Schema,
+    TrackSchema;
 
 TrackSchema = new Schema({
-    'spotify_id': {
-        type: String,
-        required: true
-    },
     title: {
         type: String,
         required: true
@@ -20,11 +16,7 @@ TrackSchema = new Schema({
     addedBy: {
         type: Schema.Types.ObjectId,
         ref: 'User'
-    },
-    'spotify_uri': {
-        type: String,
-        required: true
     }
-})
+});
 
-module.exports = mongoose.model('Track', TrackSchema)
+module.exports = mongoose.model('Track', TrackSchema);

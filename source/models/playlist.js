@@ -1,8 +1,8 @@
-'use strict'
+'use strict';
 
-var mongoose = require('mongoose')
-var Schema = mongoose.Schema
-var PlaylistSchema
+var mongoose = require('mongoose'),
+    Schema = mongoose.Schema,
+    PlaylistSchema;
 
 PlaylistSchema = new Schema({
     title: {
@@ -13,14 +13,20 @@ PlaylistSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    createdAt: {
-        type: Date,
-        'default': Date.now
-    },
     tracks: [{
         type: Schema.ObjectId,
         ref: 'Track'
     }]
-})
+});
 
-module.exports = mongoose.model('Playlist', PlaylistSchema)
+PlaylistSchema.set('toJSON', {
+    getters: true,
+    virtuals: true
+});
+
+PlaylistSchema.options.toJSON.transform = function (doc, model) {
+    delete model.__v;
+    return model;
+};
+
+module.exports = mongoose.model('Playlist', PlaylistSchema);

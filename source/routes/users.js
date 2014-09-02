@@ -2,9 +2,9 @@ module.exports = function (server) {
 
     'use strict';
 
-    var Joi = require('joi');
-    var userCtrl = require('../controllers/user');
-    var prefix = '/v1';
+    var Joi = require('joi'),
+        userCtrl = require('../controllers/user'),
+        prefix = '/v1';
 
     server.route({
         method: 'GET',
@@ -54,5 +54,4 @@ module.exports = function (server) {
         path: prefix + '/users/{userId}',
         handler: userCtrl.destroy
     });
-
 };
