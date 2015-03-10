@@ -1,57 +1,31 @@
-module.exports = function (server) {
+'use strict'
 
-    'use strict';
+var User = require('../models/user')
 
-    var Joi = require('joi'),
-        userCtrl = require('../controllers/user'),
-        prefix = '/v1';
+function routes (server) {
+  var prefix = '/v1'
 
-    server.route({
-        method: 'GET',
-        path: prefix + '/users',
-        handler: userCtrl.read.all
-    });
+  server.route({
+    method: 'POST',
+    path: prefix + '/users',
+    handler: function (request, reply) {
 
-    server.route({
-        method: 'GET',
-        path: prefix + '/users/{userId}',
-        handler: userCtrl.read.one
-    });
+      var query = {
+        email: request.payload.email,
+        name: request.payload.name,
+        username: request.payload.username
+      }
 
-    server.route({
-        method: 'POST',
-        path: prefix + '/users',
-        config: {
-            // auth: 'simple',
-            validate: {
-                payload: {
-                    name: Joi.string().min(2).max(64).required(),
-                    email: Joi.string().email().required(),
-                    password: Joi.string().min(8).max(32).required()
-                }
-            }
-        },
-        handler: userCtrl.create
-    });
+      User.register(new User(query), request.payload.password, function userRegisterCb(err, user) {
+        console.log(err)
+        if (err) {
+          return reply(err);
+        }
 
-    server.route({
-        method: 'PUT',
-        path: prefix + '/users/{userId}',
-        config: {
-            validate: {
-                payload: {
-                    name: Joi.string().min(2).max(64),
-                    email: Joi.string().email(),
-                    password: Joi.string().min(8).max(32)
-                }
-            }
-        },
-        handler: userCtrl.update
-    });
+        reply(user);
+      })
+    }
+  })
+}
 
-    server.route({
-        method: 'DELETE',
-        path: prefix + '/users/{userId}',
-        handler: userCtrl.destroy
-    });
-};
+module.exports = routes;
