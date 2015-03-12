@@ -13,6 +13,7 @@
     "url": "https://github.com/CheeseShed/Good-Tunes-API"
   },
   "dependencies": {
+    "boom": "2.6.1",
     "hapi": "8.2.0",
     "mongodb": "1.4.34",
     "mongoose": "3.8.23"

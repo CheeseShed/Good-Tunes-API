@@ -17,12 +17,25 @@ function routes (server) {
       }
 
       User.register(new User(query), request.payload.password, function userRegisterCb(err, user) {
-        console.log(err)
         if (err) {
-          return reply(err);
+          return reply(err)
         }
 
         reply(user);
+      })
+    }
+  })
+
+  server.route({
+    method: 'GET',
+    path: prefix + '/users/{id}',
+    handler: function (request, reply) {
+      User.findOne({_id: request.params.id}, function (err, user) {
+        if (err) {
+          return reply(err)
+        }
+
+        reply(user)
       })
     }
   })

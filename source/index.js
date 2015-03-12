@@ -8,6 +8,7 @@ server.connection({port: process.env.PORT || 3000})
 
 db.connect()
 
+require('./routes/access')(server)
 require('./routes/users')(server)
 
 server.start(function () {

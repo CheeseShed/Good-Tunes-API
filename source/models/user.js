@@ -1,5 +1,6 @@
-'use strict';
+'use strict'
 
+var Boom = require('Boom')
 var crypto = require('crypto')
 var mongoose = require('mongoose')
 var Schema = mongoose.Schema
@@ -37,24 +38,39 @@ User.methods.setPasswordAndSave = function (password, done) {
   var model = this
 
   crypto.randomBytes(saltLength, function (err, buf) {
-    if (err) {
-      return done(err)
-    }
+    if (err) return done(err)
 
     salt = buf.toString('hex')
 
     crypto.pbkdf2(password, salt, iterations, keyLength, function (err, derivedKey) {
-      if (err) {
-        return done(err)
-      }
+      if (err) return done(err)
 
       model.set('hash', new Buffer(derivedKey, 'binary').toString(encoding))
       model.set('salt', salt)
 
       model.save(done)
-    });
-  });
-};
+    })
+  })
+}
+
+User.methods.authenticate = function (password, cb) {
+  var model = this
+
+  // check to see if a salt exists for the user
+  if (!model.get('salt')) return cb(Boom.badRequest())
+
+  crypto.pbkdf2(password, model.get('salt'), iterations, keyLength, function (err, derivedKey) {
+    if (err) return cb(err)
+
+    var hash = new Buffer(derivedKey, 'binary').toString(encoding)
+
+    if (hash === model.get('hash')) {
+      cb(model)
+    } else {
+      cb(Boom.unauthorized('Your details are incorrect'))
+    }
+  })
+}
 
 User.static('findByEmail', function (email, cb) {
   this.findOne({email: email}, cb)
@@ -62,15 +78,27 @@ User.static('findByEmail', function (email, cb) {
 
 User.static('register', function (user, password, cb) {
   this.findByEmail(user.email, function (err, existingUser) {
-    if (err) {
-      return cb(err)
-    }
+    if (err) return cb(err)
 
     if (existingUser) {
-      return cb({error: 'Username already taken'})
+      return cb(Boom.badRequest('Username already exists'))
     }
 
     user.setPasswordAndSave(password, cb)
+  })
+})
+
+User.static('authenticate', function (payload, cb) {
+  var username = payload.email.toLowerCase()
+
+  this.findByEmail(username, function (err, user) {
+    if (err) return cb(err)
+
+    if (user) {
+      user.authenticate(payload.password, cb)
+    } else {
+      cb(Boom.badRequest('Your details are incorrect'))
+    }
   })
 })
 
