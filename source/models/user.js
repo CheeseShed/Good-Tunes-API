@@ -37,26 +37,35 @@ User.index({
   unique: true
 })
 
-User.methods.setPasswordAndSave = function (password, done) {
+User.methods.setPasswordAndSave = function (password, cb) {
   var salt
   var model = this
 
   crypto.randomBytes(saltLength, function (err, buf) {
-    if (err) return done(err)
+    if (err) {
+      console.error(err)
+      return cb(err)
+    }
 
     salt = buf.toString('hex')
 
     crypto.pbkdf2(password, salt, iterations, keyLength, function (err, derivedKey) {
-      if (err) return done(err)
+      if (err) {
+        console.error(err)
+        return cb(err)
+      }
 
       model.set('hash', new Buffer(derivedKey, 'binary').toString(encoding))
       model.set('salt', salt)
       model.set('token', createToken())
 
       model.save(function (err, user) {
-        if (err) return done(err)
+        if (err) {
+          console.error(err)
+          return cb(err)
+        }
 
-        done(user)
+        cb(user)
       })
     })
   })
@@ -69,7 +78,10 @@ User.methods.authenticate = function (password, cb) {
   if (!model.get('salt')) return cb(Boom.badRequest())
 
   crypto.pbkdf2(password, model.get('salt'), iterations, keyLength, function (err, derivedKey) {
-    if (err) return cb(err)
+    if (err) {
+      console.error(err)
+      return cb(err)
+    }
 
     var hash = new Buffer(derivedKey, 'binary').toString(encoding)
 
@@ -86,9 +98,27 @@ User.static('findByEmail', function (email, cb) {
   this.findOne({email: email}, cb)
 })
 
+User.static('findOneByToken', function (token, cb) {
+  this.findOne({token: token}, function (err, user) {
+    if (err) {
+      console.error(err)
+      return cb(err)
+    }
+
+    if (user) {
+      cb(null, true, {_id: user.id, name: user.name, email: user.email})
+    } else {
+      cb(null, false)
+    }
+  })
+})
+
 User.static('register', function (user, password, cb) {
   this.findByEmail(user.email, function (err, existingUser) {
-    if (err) return cb(err)
+    if (err) {
+      console.error(err)
+      return cb(err)
+    }
 
     if (existingUser) {
       return cb(Boom.badRequest('Username already exists'))
@@ -99,10 +129,13 @@ User.static('register', function (user, password, cb) {
 })
 
 User.static('authenticate', function (payload, cb) {
-  var username = payload.email.toLowerCase()
+  var email = payload.email.toLowerCase()
 
-  this.findByEmail(username, function (err, user) {
-    if (err) return cb(err)
+  this.findByEmail(email, function (err, user) {
+    if (err) {
+      console.error(err)
+      return cb(err)
+    }
 
     if (user) {
       user.authenticate(payload.password, cb)
@@ -114,7 +147,10 @@ User.static('authenticate', function (payload, cb) {
 
 User.static('logout', function (payload, cb) {
   this.findById(payload.id, function (err, user) {
-    if (err) return cb(err)
+    if (err) {
+      console.error(err)
+      return cb(err)
+    }
 
     if (!user) return cb(Boom.badRequest('Your details are incorrect'))
 

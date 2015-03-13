@@ -16,7 +16,10 @@ function routes (server) {
       }
 
       User.register(new User(query), request.payload.password, function userRegisterCb(err, user) {
-        if (err) reply(err)
+        if (err) {
+          console.error(err)
+          return reply(err)
+        }
 
         reply(user);
       })
@@ -26,9 +29,15 @@ function routes (server) {
   server.route({
     method: 'GET',
     path: baseUrl + '/users/{id}',
+    config: {
+      auth: 'user'
+    },
     handler: function (request, reply) {
       User.findOne({_id: request.params.id}, function (err, user) {
-        if (err) return reply(err)
+        if (err) {
+          console.error(err)
+          return reply(err)
+        }
 
         reply(user)
       })
