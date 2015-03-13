@@ -94,6 +94,10 @@ User.methods.authenticate = function (password, cb) {
   })
 }
 
+User.static('readAll', function (cb) {
+  this.find({}).exec(cb)
+})
+
 User.static('findByEmail', function (email, cb) {
   this.findOne({email: email}, cb)
 })
