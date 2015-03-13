@@ -3,6 +3,7 @@
 var Boom = require('Boom')
 var crypto = require('crypto')
 var mongoose = require('mongoose')
+var uuid = require('node-uuid')
 var Schema = mongoose.Schema
 var iterations = 25000
 var keyLength = 512
@@ -24,6 +25,9 @@ User = new Schema({
   createdAt: {
     type: Date,
     default: Date.now()
+  },
+  token: {
+    type: String
   }
 })
 
@@ -47,8 +51,13 @@ User.methods.setPasswordAndSave = function (password, done) {
 
       model.set('hash', new Buffer(derivedKey, 'binary').toString(encoding))
       model.set('salt', salt)
+      model.set('token', createToken())
 
-      model.save(done)
+      model.save(function (err, user) {
+        if (err) return done(err)
+
+        done(user)
+      })
     })
   })
 }
@@ -65,7 +74,8 @@ User.methods.authenticate = function (password, cb) {
     var hash = new Buffer(derivedKey, 'binary').toString(encoding)
 
     if (hash === model.get('hash')) {
-      cb(model)
+      model.set('token', createToken())
+      model.save(cb)
     } else {
       cb(Boom.unauthorized('Your details are incorrect'))
     }
@@ -102,6 +112,21 @@ User.static('authenticate', function (payload, cb) {
   })
 })
 
+User.static('logout', function (payload, cb) {
+  this.findById(payload.id, function (err, user) {
+    if (err) return cb(err)
+
+    if (!user) return cb(Boom.badRequest('Your details are incorrect'))
+
+    user.set('token', null)
+    user.save(cb)
+  })
+})
+
+function createToken() {
+  return uuid.v4()
+}
+
 User.set('toJSON', {
   getters: true,
   virtuals: true
@@ -109,10 +134,11 @@ User.set('toJSON', {
 
 User.options.toJSON.transform = function (doc, model) {
   return {
+    createdAt: model.createdAt,
+    email: model.email,
     id: model._id,
     name: model.name,
-    email: model.email,
-    createdAt: model.createdAt
+    token: model.token
   }
 }
 

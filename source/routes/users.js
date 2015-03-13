@@ -3,23 +3,20 @@
 var User = require('../models/user')
 
 function routes (server) {
-  var prefix = '/v1'
+  var baseUrl = '/v1'
 
   server.route({
     method: 'POST',
-    path: prefix + '/users',
+    path: baseUrl + '/users',
     handler: function (request, reply) {
 
       var query = {
         email: request.payload.email,
-        name: request.payload.name,
-        username: request.payload.username
+        name: request.payload.name
       }
 
       User.register(new User(query), request.payload.password, function userRegisterCb(err, user) {
-        if (err) {
-          return reply(err)
-        }
+        if (err) reply(err)
 
         reply(user);
       })
@@ -28,12 +25,10 @@ function routes (server) {
 
   server.route({
     method: 'GET',
-    path: prefix + '/users/{id}',
+    path: baseUrl + '/users/{id}',
     handler: function (request, reply) {
       User.findOne({_id: request.params.id}, function (err, user) {
-        if (err) {
-          return reply(err)
-        }
+        if (err) return reply(err)
 
         reply(user)
       })
