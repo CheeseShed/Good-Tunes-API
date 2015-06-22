@@ -1,6 +1,6 @@
 'use strict'
 
-var Boom = require('Boom')
+var Boom = require('boom')
 var crypto = require('crypto')
 var mongoose = require('mongoose')
 var uuid = require('node-uuid')
