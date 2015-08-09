@@ -1,6 +1,6 @@
-'use strict'
+'use strict';
 
-var User = require('../models/user')
+var User = require('../models/user');
 
 function routes (server) {
   var baseUrl = '/v1';
@@ -10,24 +10,24 @@ function routes (server) {
     path: baseUrl + '/login',
     handler: function (request, reply) {
       User.authenticate(request.payload, function (err, user) {
-        if (err) return reply(err)
+        if (err) return reply(err);
 
-        reply(user)
-      })
+        reply(user);
+      });
     }
-  })
+  });
 
   server.route({
     method: 'POST',
     path: baseUrl + '/logout',
     handler: function (request, reply) {
       User.logout(request.payload, function (err) {
-        if (err) return reply(err)
+        if (err) return reply(err);
 
-        reply('Success')
-      })
+        reply('Success');
+      });
     }
-  })
+  });
 }
 
 module.exports = routes;
