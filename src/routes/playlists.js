@@ -1,97 +1,105 @@
-module.exports = function (server) {
+'use strict';
 
-    'use strict';
+var joi = require('joi');
+var Playlist = require('../models/Playlist');
+var validators = require('../util/validators');
+var baseUrl = '/v1';
 
-    var Joi = require('joi'),
-        playlist = require('../controllers/playlist'),
-        prefix = '/v1';
+function playlists(server) {
 
-    server.route({
-        method: 'GET',
-        path: prefix + '/playlists',
-        handler: playlist.read.all
-    });
+  server.route({
+    method: 'POST',
+    path: baseUrl + '/playlists',
+    config: {
+      auth: 'user',
+      validate: {
+        payload: {
+          title: joi.string().required(),
+          description: joi.string().required()
+        }
+      }
+    },
+    handler: function (request, reply) {
+      Playlist.create({
+        title: request.payload.title,
+        description: request.payload.description,
+        creator: request.auth.credentials.id.toString()
+      }, function (err, playlist) {
 
-    server.route({
-        method: 'POST',
-        path: prefix + '/playlists',
-        config: {
-            validate: {
-                payload: {
-                    title: Joi.string().min(2).max(128).required().description('Title of the playlist'),
-                    user: Joi.string().regex(/^[a-f\d]{24}$/i).required().description('ID of the user')
-                }
-            }
-        },
-        handler: playlist.create
-    });
+        if (err) {
+          console.error(err);
+          return reply(err);
+        }
 
-//    router.route('/playlists')
-//
-//        .post(function(req, res) {
-//            Playlist.create(req.body, function(err, playlist) {
-//                if (err) {
-//                    return res.json(err)
-//                }
-//                res.json(playlist)
-//            })
-//        })
-//
-//        .get(function(req, res) {
-//            Playlist.find(function(err, playlists) {
-//                if (err) {
-//                    return res.json(err)
-//                }
-//                res.json(playlists)
-//            })
-//        })
-//
-//    router.route('/playlists/:playlistId')
-//
-//        .get(function(req, res) {
-//            Playlist.findById(req.params.playlistId, function(err, playlist) {
-//                if (err) {
-//                    return res.json(err)
-//                }
-//                res.json(playlist)
-//            })
-//        })
-//
-//        .put(function(req, res) {
-//            var query = {
-//                _id: req.params.playlistId
-//            }
-//            var update = {
-//                $push: req.body
-//            }
-//            var options = {
-//                new: true
-//            }
-//
-//            if (req.body.tracks && req.body.tracks.length) {
-//                var test = req.body.tracks.map(function(trackId) {
-//
-//                    return new ObjectId(trackId)
-//                })
-//                console.log(test)
-//            }
-//            console.log(update.$push)
-//            Playlist.findOneAndUpdate(query, update, options, function(err, playlist) {
-//                if (err) {
-//                    return res.json(err)
-//                }
-//                res.json(playlist)
-//            })
-//        })
-//
-//        .delete(function(req, res) {
-//            Playlist.remove({
-//                _id: req.params.playlistId
-//            }, function(err, playlist) {
-//                if (err) {
-//                    return res.json(err)
-//                }
-//                res.json(playlist)
-//            })
-//        })
+        reply(playlist);
+      });
+    }
+  });
+
+  server.route({
+    method: 'GET',
+    path: baseUrl + '/playlists',
+    handler: function (request, reply) {
+      Playlist.find({}, function (err, playlists) {
+
+        if (err) {
+          console.error(err);
+          return reply(err);
+        }
+
+        reply(playlists);
+      });
+    }
+  });
+
+  server.route({
+    method: 'GET',
+    path: baseUrl + '/playlists/{id}',
+    handler: function (request, reply) {
+      Playlist.findOne({
+        _id: request.params.id
+      }, function (err, playlist) {
+        if (err) {
+          return reply(err);
+        }
+
+        reply(playlist);
+      });
+    }
+  });
+
+  server.route({
+    method: 'PUT',
+    path: baseUrl + '/playlists/{id}',
+    config: {
+      auth: 'user',
+      pre: [validators.isUser],
+      validate: {
+        payload: {
+          title: joi.string().min(2).max(128).required().description('Title of the playlist'),
+          description: joi.string().min(2).max(256).required().description('There must be a description for the playlist')
+        }
+      }
+    },
+    handler: function (request, reply) {
+      var query = {
+        _id: request.params.id
+      };
+
+      var data = {
+        title: request.payload.title,
+        description: request.payload.description
+      };
+
+      Playlist.findOneAndUpdate(query, data, function (err, playlist) {
+        if (err) {
+          return reply(err);
+        }
+
+        reply(playlist);
+      });
+    }
+  });
 }
+
+module.exports = playlists;

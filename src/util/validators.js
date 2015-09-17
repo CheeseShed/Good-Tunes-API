@@ -2,21 +2,40 @@
 
 var boom = require('boom');
 var accessLevels = require('../enums/accessLevels');
+var User = require('../models/user');
+var validators = {};
 
-var validators = {
-  isUser: function (request, reply) {
-    var isAuthenticated = request.auth.isAuthenticated;
-    var credentials = request.auth.credentials;
-    var requestedUser = request.params.user;
+function isUser(request, reply) {
+  var isAuthenticated = request.auth.isAuthenticated;
+  var credentials = request.auth.credentials;
+  var requestedUser = request.params.user;
 
-    if (isAuthenticated && credentials.accessLevel === accessLevels.ADMIN) {
-      return reply();
-    } else if (credentials.id === requestedUser && credentials.accessLevel === accessLevels.USER) {
-      return reply();
-    } else {
-      return reply(boom.unauthorized());
-    }
+  if (isAuthenticated && credentials.accessLevel === accessLevels.ADMIN) {
+    return reply();
+  } else if (credentials.id === requestedUser && credentials.accessLevel === accessLevels.USER) {
+    return reply();
+  } else {
+    return reply(boom.unauthorized());
   }
+}
+
+function doesAccountExist(request, reply) {
+  User
+    .find({_id: request.params.id})
+    .exec(function (err, user) {
+      if (err) {
+        return reply(err);
+      } else if (!user.length) {
+        return reply(boom.notFound());
+      } else {
+        return reply();
+      }
+    });
+}
+
+validators = {
+  doesAccountExist: doesAccountExist,
+  isUser: isUser
 };
 
 module.exports = validators;

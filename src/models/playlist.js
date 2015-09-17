@@ -1,32 +1,38 @@
 'use strict';
 
-var mongoose = require('mongoose'),
-    Schema = mongoose.Schema,
-    PlaylistSchema;
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+var Playlist;
 
-PlaylistSchema = new Schema({
+Playlist = new Schema({
     title: {
         type: String,
         required: true
     },
-    createdBy: {
-        type: Schema.Types.ObjectId,
-        ref: 'User'
+    description: {
+      type: String,
+      required: true
     },
-    tracks: [{
-        type: Schema.ObjectId,
-        ref: 'Track'
-    }]
+    creator: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    created: {
+      type: Date,
+      default: Date.now()
+    }
 });
 
-PlaylistSchema.set('toJSON', {
+Playlist.set('toJSON', {
     getters: true,
     virtuals: true
 });
 
-PlaylistSchema.options.toJSON.transform = function (doc, model) {
+Playlist.options.toJSON.transform = function (doc, model) {
     delete model.__v;
+    delete model._id;
     return model;
 };
 
-module.exports = mongoose.model('Playlist', PlaylistSchema);
+module.exports = mongoose.model('Playlist', Playlist);

@@ -57,24 +57,28 @@ function routes (server) {
 
   server.route({
     method: 'GET',
-    path: baseUrl + '/users/{user}',
+    path: baseUrl + '/users/{id}',
     config: {
       auth: 'user',
-      pre: [validators.isUser]
+      pre: [validators.doesAccountExist],
+      description: 'Get one user',
+      tags: ['api']
     },
     handler: function (request, reply) {
       var query = {
-        _id: request.params.user
+        _id: request.params.id
       };
 
-      User.findOne(query, function (err, user) {
-        if (err) {
-          console.error(err);
-          return reply(err);
-        }
+      User
+        .find({_id: request.params.id})
+        .select('name id')
+        .exec(function (err, user) {
+          if (err) {
+            return reply(err);
+          }
 
-        reply(user);
-      });
+          reply(user);
+        });
     }
   });
 }

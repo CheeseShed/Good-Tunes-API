@@ -1,47 +1,56 @@
-module.exports = function(router) {
-    'use strict'
-    
-    var Track = require('../models/track')
+'use strict';
 
-    router.route('/tracks')
+var Track = require('../models/track');
+var baseUrl = '/v1';
 
-        .get(function(req, res) {
-            Track.find(function(err, tracks) {
-                if (err) {
-                    return res.json(err)
-                }
-                res.json(tracks)
-            })
-        })
+function tracks(server) {
 
-        .post(function(req, res) {
-            var spotifyId = '4GGw2WhvFOniMdAl8ZLpVW'
-            var spotifyUri = 'spotify:track:4GGw2WhvFOniMdAl8ZLpVW'
+  server.route({
+    method: 'POST',
+    path: baseUrl + '/tracks',
+    config: {
+      auth: 'user'
+    },
+    handler: function (request, reply) {
+      Track.create({
+        'spotify_id': request.payload.spotify_id,
+        'spotify_uri': request.payload.spotify_uri,
+        creator: request.payload.user,
+        playlist: request.payload.playlist
+      }, function (err, track) {
+        if (err) {
+          console.error(err);
+          return reply(err);
+        }
 
-            Track.create({
-                addedBy: req.body.user,
-                title: req.body.title,
-                artist: req.body.artist,
-                'spotify_id': spotifyId,
-                'spotify_uri': spotifyUri
-            }, function(err, track) {
-                if (err) {
-                    return res.json(err)
-                }
-                res.json(track)
-            })
-        })
+        reply(track);
+      });
+    }
+  });
 
-    router.route('/tracks/:track_id')
+  server.route({
+    method: 'GET',
+    path: baseUrl + '/tracks',
+    handler: function (request, reply) {
 
-        .get(function(req, res) {
-            var trackId = req.params['track_id']
+      var query = {
+        playlist: request.query.playlist
+      };
 
-            Track.findById(trackId, function(err, track) {
-                if (err) {
-                    return res.json(err)
-                }
-                res.json(track)
-            })
-        })
+      Track
+        .find(query)
+        // .populate('creator', 'id name')
+        // .populate('playlist')
+        .exec(function (err, tracks) {
+          if (err) {
+            console.error(err);
+            return reply(err);
+          }
+
+          reply(tracks);
+        });
+    }
+  });
 }
+
+module.exports = tracks;
