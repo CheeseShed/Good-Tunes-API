@@ -1,11 +1,13 @@
 'use strict';
 
+var async = require('async');
+var mongoose = require('mongoose');
 var joi = require('joi');
 var Playlist = require('../models/Playlist');
 var validators = require('../util/validators');
 var baseUrl = '/v1';
 
-function playlists(server) {
+function playlists(server, connection) {
 
   server.route({
     method: 'POST',
@@ -23,7 +25,7 @@ function playlists(server) {
       Playlist.create({
         title: request.payload.title,
         description: request.payload.description,
-        creator: request.auth.credentials.id.toString()
+        createdBy: request.auth.credentials.id.toString()
       }, function (err, playlist) {
 
         if (err) {
@@ -56,15 +58,56 @@ function playlists(server) {
     method: 'GET',
     path: baseUrl + '/playlists/{id}',
     handler: function (request, reply) {
-      Playlist.findOne({
-        _id: request.params.id
-      }, function (err, playlist) {
-        if (err) {
-          return reply(err);
-        }
 
-        reply(playlist);
+      var fetchPlaylist = function (next) {
+        Playlist.findOne({
+          _id: request.params.id
+        }, function (err, playlist) {
+          if (err) {
+            console.error(err);
+            return next(err);
+          }
+
+          next(null, playlist);
+        });
+      };
+
+      var fetchPlaylistTracks = function (playlist, next) {
+        connection
+          .model('Track')
+          .find({playlist: playlist.id})
+          .exec(function (err, tracks) {
+            if (err) {
+              console.error(err);
+              return next(err);
+            }
+
+            next(null, playlist, tracks);
+          });
+      };
+
+      async.waterfall([
+        fetchPlaylist,
+        fetchPlaylistTracks,
+        function (playlist, tracks) {
+          var response = {};
+
+          response.links = {
+            self: request.server.info.uri + request.path
+          };
+
+          response.data = {
+            playlist: playlist,
+            tracks: tracks
+          };
+
+          reply(response);
+        }
+      ], function (err, result) {
+        console.log(result);
+        return reply(err);
       });
+
     }
   });
 

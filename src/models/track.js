@@ -1,25 +1,26 @@
 'use strict';
 
 var mongoose = require('mongoose');
+var lastModifiedPlugin = require('./plugins/last-modified');
 var Schema = mongoose.Schema;
 var Track;
 
 Track = new Schema({
-  'spotify_id': String,
-  'spotify_uri': String,
   playlist: {
     type: Schema.Types.ObjectId,
     ref: 'Playlist'
   },
-  creator: {
+  donatedBy: {
     type: Schema.Types.ObjectId,
     ref: 'User'
   },
-  created: {
-    type: Date,
-    default: Date.now()
-  }
+  name: String,
+  'spotify_id': String,
+  'duration_ms': Number,
+  uri: String
 });
+
+Track.plugin(lastModifiedPlugin);
 
 Track.set('toJSON', {
     getters: true,

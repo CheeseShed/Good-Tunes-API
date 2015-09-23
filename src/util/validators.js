@@ -33,8 +33,14 @@ function doesAccountExist(request, reply) {
     });
 }
 
+function doesResourceExist(request, reply) {
+  console.log(request);
+  return reply();
+}
+
 validators = {
   doesAccountExist: doesAccountExist,
+  doesResourceExist: doesResourceExist,
   isUser: isUser
 };
 

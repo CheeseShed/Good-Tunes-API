@@ -1,5 +1,6 @@
 'use strict';
 
+var pick = require('lodash/object/pick');
 var Track = require('../models/track');
 var baseUrl = '/v1';
 
@@ -12,12 +13,16 @@ function tracks(server) {
       auth: 'user'
     },
     handler: function (request, reply) {
-      Track.create({
-        'spotify_id': request.payload.spotify_id,
-        'spotify_uri': request.payload.spotify_uri,
-        creator: request.payload.user,
-        playlist: request.payload.playlist
-      }, function (err, track) {
+      var data = {};
+
+      data.donatedBy = request.auth.credentials.id;
+      data.playlist = request.payload.playlist;
+      data.name = request.payload.name;
+      data['spotify_id'] = request.payload.id;
+      data['duration_ms'] = request.payload['duration_ms'];
+      data.uri = request.payload.uri;
+
+      Track.create(data, function (err, track) {
         if (err) {
           console.error(err);
           return reply(err);

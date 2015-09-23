@@ -1,6 +1,7 @@
 'use strict';
 
 var mongoose = require('mongoose');
+var lastModifiedPlugin = require('./plugins/last-modified');
 var Schema = mongoose.Schema;
 var Playlist;
 
@@ -13,16 +14,14 @@ Playlist = new Schema({
       type: String,
       required: true
     },
-    creator: {
+    createdBy: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
-    },
-    created: {
-      type: Date,
-      default: Date.now()
     }
 });
+
+Playlist.plugin(lastModifiedPlugin);
 
 Playlist.set('toJSON', {
     getters: true,
