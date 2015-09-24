@@ -2,15 +2,19 @@
   "name": "good-tunes-api",
   "version": "0.0.1",
   "description": "Good Tunes API",
-  "main": "index.js",
+  "main": "./lib/index.js",
   "scripts": {
-    "start": "env $(cat ./config/.develop.env) nodemon ./src/index.js"
+    "dev": "env $(cat ./config/.develop.env) ./node_modules/.bin/nodemon ./server.js"
   },
   "author": "Cheese Shed Zepellin",
   "license": "ISC",
   "repository": {
     "type": "git",
     "url": "https://github.com/CheeseShed/Good-Tunes-API"
+  },
+  "private": true,
+  "engines": {
+    "node": "4.x"
   },
   "dependencies": {
     "async": "1.4.2",
@@ -22,5 +26,8 @@
     "lodash": "^3.10.1",
     "mongoose": "4.1.8",
     "node-uuid": "1.4.3"
+  },
+  "devDependencies": {
+    "nodemon": "^1.7.0"
   }
 }
