@@ -11,7 +11,7 @@ var name = process.env.MONGO_NAME
 var externals = {}
 
 externals.connect = function () {
-  var path = 'mongodb://' + user + ':' + password + '@' + host + ':' + port + '/' + name
+  var path = 'mongodb://' + host + ':' + port + '/' + name
   return mongoose.connect(path)
 }
 

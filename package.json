@@ -4,21 +4,23 @@
   "description": "Good Tunes API",
   "main": "index.js",
   "scripts": {
-    "start": "env $(cat ./config/.local.env) nodemon ./source/"
+    "start": "env $(cat ./config/.develop.env) nodemon ./src/index.js"
   },
-  "author": "Cheese Shed",
+  "author": "Cheese Shed Zepellin",
   "license": "ISC",
   "repository": {
     "type": "git",
     "url": "https://github.com/CheeseShed/Good-Tunes-API"
   },
   "dependencies": {
-    "boom": "2.6.1",
-    "hapi": "8.2.0",
+    "async": "1.4.2",
+    "bell": "5.1.0",
+    "boom": "2.9.0",
+    "hapi": "10.0.0",
     "hapi-auth-bearer-token": "3.1.1",
-    "joi": "6.0.8",
-    "mongodb": "1.4.34",
-    "mongoose": "3.8.23",
+    "joi": "6.7.1",
+    "lodash": "^3.10.1",
+    "mongoose": "4.1.8",
     "node-uuid": "1.4.3"
   }
 }

@@ -3,7 +3,7 @@ var Playlist = require('../models/playlist');
 module.exports.create = function (request, reply) {
     var query = {
         title: request.payload.title,
-        createdBy: request.payload.user
+        creator: request.payload.user
     };
 
     Playlist.create(query, function (err, playlist) {

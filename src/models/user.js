@@ -4,6 +4,7 @@ var Boom = require('Boom')
 var crypto = require('crypto')
 var mongoose = require('mongoose')
 var uuid = require('node-uuid')
+var accessLevels = require('../enums/accessLevels');
 var Schema = mongoose.Schema
 var iterations = 25000
 var keyLength = 512
@@ -12,6 +13,10 @@ var encoding = 'hex'
 var User
 
 User = new Schema({
+  accessLevel: {
+    type: Number,
+    default: accessLevels.USER
+  },
   name: {
     type: String,
     required: true
@@ -101,6 +106,22 @@ User.static('readAll', function (cb) {
 User.static('findByEmail', function (email, cb) {
   this.findOne({email: email}, cb)
 })
+
+User.static('findOneByTokenAndAccessLevel', function (token, accessLevel, cb) {
+  this.findOne({token: token, accessLevel: {$lte: accessLevel}}, function (err, user) {
+    if (err) {
+      console.error(err);
+      return cb(err);
+    }
+
+    if (!user) {
+      return cb(null, false);
+    } else {
+      // found matching user, return user ID
+      return cb(null, true, {id: user._id.toString(), accessLevel: user.accessLevel});
+    }
+  });
+});
 
 User.static('findOneByToken', function (token, cb) {
   this.findOne({token: token}, function (err, user) {
