@@ -1,0 +1,14 @@
+{
+    "title": "Ben’s New York Marathon Mix",
+    "charity": "Every Mother Counts",
+    "description": "Here is the description about what you are doing. Mulitple paragraphs etc.",
+    "currency": "GBP",
+    "raised": 0,
+    "target": 3500,
+    "target_date": "2015/10/15",
+    "attributes": {
+        "donation_provider" : "Crowdrise",
+        "donation_provider_url" : "https://www.crowdrise.com/everymothernyc2015/fundraiser/benjaminschwab",
+        "donation_provider_account_id" : "560106"
+    }
+}
