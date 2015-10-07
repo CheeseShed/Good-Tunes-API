@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "async": "1.4.2",
+    "aws-sdk": "^2.2.6",
     "bell": "5.1.0",
     "boom": "2.9.0",
     "hapi": "10.0.0",
