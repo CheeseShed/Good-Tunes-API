@@ -2,9 +2,9 @@
   "name": "good-tunes-api",
   "version": "0.0.2",
   "description": "Good Tunes API",
-  "main": "./lib/index.js",
+  "main": "./server.js",
   "scripts": {
-    "dev": "env $(cat ./config/.develop.env) ./node_modules/.bin/nodemon ./server.js"
+    "local": "env $(cat ./config/.develop.env) ./node_modules/.bin/nodemon ./server.js"
   },
   "author": "Cheese Shed Zepellin",
   "license": "ISC",
@@ -14,13 +14,13 @@
   },
   "private": true,
   "engines": {
-    "node": "4.x"
+    "node": "6.x"
   },
   "dependencies": {
     "async": "1.5.2",
     "bell": "7.5.1",
     "boom": "3.1.2",
-    "hapi": "13.3.0",
+    "hapi": "13.4.0",
     "hapi-auth-bearer-token": "4.0.2",
     "joi": "8.0.5",
     "lodash": "4.11.1",
@@ -28,6 +28,6 @@
     "node-uuid": "1.4.7"
   },
   "devDependencies": {
-    "nodemon": "1.9.1"
+    "nodemon": "^1.9.2"
   }
 }
